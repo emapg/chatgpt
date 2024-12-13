@@ -1,14 +1,5 @@
 import { create } from "zustand";
-
-interface Message {
-  sender: "user" | "bot";
-  text: string;
-}
-
-interface ChatState {
-  messages: Message[];
-  addMessage: (message: Message) => void;
-}
+import { Message, ChatState } from "./types";
 
 const useChatStore = create<ChatState>((set) => ({
   messages: [],
