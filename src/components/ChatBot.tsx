@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
 import useChatStore from "../store";
-import { Send, User, Robot } from "lucide-react";
+import { Send, User, Bot } from "lucide-react"; // Replaced `Robot` with `Bot`
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { Message } from "../types";
+import { Message, GenerateContentResponse } from "../types";
 
 const ChatBot: React.FC = () => {
   const { messages, addMessage } = useChatStore();
-  const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [input, setInput] = useState<string>("");
+  const [isTyping, setIsTyping] = useState<boolean>(false);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -27,22 +27,17 @@ const ChatBot: React.FC = () => {
     setIsTyping(true);
 
     try {
-      const response = await axios.post<GenerateTextResponse>(
-        "https://generativelanguage.googleapis.com/v1beta2/models/text-bison-001:generateText",
+      const response = await axios.post<GenerateContentResponse>(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${import.meta.env.VITE_GOOGLE_API_KEY}`,
         {
           prompt: { text: input },
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_GOOGLE_API_KEY}`,
-          },
         }
       );
 
       const botReply: Message = {
         id: `${Date.now()}-bot`,
         sender: "bot",
-        text: response.data?.candidates?.[0]?.output || "No response.",
+        text: response.data?.candidates?.[0]?.output || "Sorry, I didn't understand that.",
         timestamp: Date.now(),
       };
       addMessage(botReply);
@@ -63,7 +58,7 @@ const ChatBot: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between bg-blue-600 text-white px-4 py-2 rounded-md shadow">
         <h1 className="text-lg font-semibold">AI Chatbot</h1>
-        <Robot size={24} />
+        <Bot size={24} /> {/* Updated icon */}
       </div>
 
       {/* Chat Window */}
