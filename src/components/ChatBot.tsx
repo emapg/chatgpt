@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import useChatStore from "../store";
-import { Send, User, Bot } from "lucide-react"; // Replaced `Robot` with `Bot`
+import { Send, User, Bot } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -54,11 +54,11 @@ const ChatBot: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-3xl mx-auto p-4 bg-gray-100 shadow-lg rounded-lg">
+    <div className="flex flex-col h-screen max-w-3xl mx-auto bg-gradient-to-r from-blue-500 to-indigo-500 p-4">
       {/* Header */}
-      <div className="flex items-center justify-between bg-blue-600 text-white px-4 py-2 rounded-md shadow">
+      <div className="flex items-center justify-between bg-gradient-to-r from-blue-700 to-purple-700 text-white px-4 py-2 rounded-md shadow-md">
         <h1 className="text-lg font-semibold">AI Chatbot</h1>
-        <Bot size={24} /> {/* Updated icon */}
+        <Bot size={24} />
       </div>
 
       {/* Chat Window */}
@@ -70,10 +70,15 @@ const ChatBot: React.FC = () => {
               msg.sender === "user" ? "justify-end" : "justify-start"
             }`}
           >
+            {msg.sender === "bot" && (
+              <div className="flex-shrink-0">
+                <Bot className="w-8 h-8 text-blue-500" />
+              </div>
+            )}
             <div
               className={`max-w-xs p-3 rounded-lg ${
                 msg.sender === "user"
-                  ? "bg-blue-500 text-white"
+                  ? "bg-blue-600 text-white"
                   : "bg-gray-200 text-black"
               }`}
             >
@@ -98,13 +103,21 @@ const ChatBot: React.FC = () => {
                 {msg.text}
               </ReactMarkdown>
               <span className="block mt-2 text-xs text-gray-500">
-                {new Date(msg.timestamp).toLocaleTimeString()}
+                {new Date(msg.timestamp).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </span>
             </div>
+            {msg.sender === "user" && (
+              <div className="flex-shrink-0">
+                <User className="w-8 h-8 text-blue-600" />
+              </div>
+            )}
           </div>
         ))}
         {isTyping && (
-          <div className="text-gray-500 italic">Bot is typing...</div>
+          <div className="text-gray-500 italic mt-2">Bot is typing...</div>
         )}
       </div>
 
@@ -112,13 +125,13 @@ const ChatBot: React.FC = () => {
       <div className="mt-4 flex items-center space-x-2">
         <input
           type="text"
-          className="flex-1 p-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+          className="flex-1 p-3 border rounded-md focus:outline-none focus:ring focus:ring-blue-500"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type your message..."
         />
         <button
-          className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:ring focus:ring-blue-300"
+          className="p-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:ring focus:ring-blue-300"
           onClick={sendMessage}
         >
           <Send size={20} />
