@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import useChatStore from "../store";
-import { Send, User, Bot } from "lucide-react"; // Update with correct icon imports
+import { Send, User, Bot } from "lucide-react"; // Using correct Bot icon
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -27,6 +27,7 @@ const ChatBot: React.FC = () => {
     setIsTyping(true);
 
     try {
+      // Post to Gemini API with the correct structure based on your provided curl
       const response = await axios.post(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${import.meta.env.VITE_GOOGLE_API_KEY}`,
         {
@@ -34,7 +35,7 @@ const ChatBot: React.FC = () => {
             {
               parts: [
                 {
-                  text: input, // the user input as the prompt for the AI
+                  text: input, // Pass the input as the prompt
                 },
               ],
             },
@@ -47,6 +48,7 @@ const ChatBot: React.FC = () => {
         }
       );
 
+      // Handle successful response from the API
       const botReply: Message = {
         id: `${Date.now()}-bot`,
         sender: "bot",
@@ -57,10 +59,11 @@ const ChatBot: React.FC = () => {
       };
       addMessage(botReply);
     } catch (error) {
+      console.error("API Error:", error);
       addMessage({
         id: `${Date.now()}-bot-error`,
         sender: "bot",
-        text: "Error connecting to the API.",
+        text: "Error connecting to the API. Please try again later.",
         timestamp: Date.now(),
       });
     } finally {
