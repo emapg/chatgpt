@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
 import useChatStore from "../store";
-import { Send, User, Bot } from "lucide-react";
+import { Send, User, Bot } from "lucide-react"; // Update with correct icon imports
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { Message, GenerateContentResponse } from "../types";
+import { Message } from "../types";
 
 const ChatBot: React.FC = () => {
   const { messages, addMessage } = useChatStore();
@@ -27,17 +27,32 @@ const ChatBot: React.FC = () => {
     setIsTyping(true);
 
     try {
-      const response = await axios.post<GenerateContentResponse>(
+      const response = await axios.post(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${import.meta.env.VITE_GOOGLE_API_KEY}`,
         {
-          prompt: { text: input },
+          contents: [
+            {
+              parts: [
+                {
+                  text: input, // the user input as the prompt for the AI
+                },
+              ],
+            },
+          ],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
       );
 
       const botReply: Message = {
         id: `${Date.now()}-bot`,
         sender: "bot",
-        text: response.data?.candidates?.[0]?.output || "Sorry, I didn't understand that.",
+        text:
+          response.data?.candidates?.[0]?.output ||
+          "Sorry, I didn't understand that.",
         timestamp: Date.now(),
       };
       addMessage(botReply);
@@ -54,9 +69,9 @@ const ChatBot: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-3xl mx-auto bg-gradient-to-r from-blue-500 to-indigo-500 p-4">
+    <div className="flex flex-col h-screen max-w-3xl mx-auto p-4 bg-gray-100 shadow-lg rounded-lg">
       {/* Header */}
-      <div className="flex items-center justify-between bg-gradient-to-r from-blue-700 to-purple-700 text-white px-4 py-2 rounded-md shadow-md">
+      <div className="flex items-center justify-between bg-blue-600 text-white px-4 py-2 rounded-md shadow">
         <h1 className="text-lg font-semibold">AI Chatbot</h1>
         <Bot size={24} />
       </div>
@@ -70,11 +85,6 @@ const ChatBot: React.FC = () => {
               msg.sender === "user" ? "justify-end" : "justify-start"
             }`}
           >
-            {msg.sender === "bot" && (
-              <div className="flex-shrink-0">
-                <Bot className="w-8 h-8 text-blue-500" />
-              </div>
-            )}
             <div
               className={`max-w-xs p-3 rounded-lg ${
                 msg.sender === "user"
