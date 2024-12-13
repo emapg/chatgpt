@@ -7,7 +7,13 @@ export interface Message {
   timestamp: number;
 }
 
-export interface GenerateTextResponse {
+export interface GenerateContentRequest {
+  prompt: {
+    text: string;
+  };
+}
+
+export interface GenerateContentResponse {
   candidates: { output: string }[];
 }
 
